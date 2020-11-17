@@ -1,1 +1,2 @@
 add_subdirectory(single_thread_udp_receiver)
+add_subdirectory(udp_time_receiver)
