@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
         scanf("%[^\n]s", msgPacket.data);
         getchar();
 
-        if (!strcasecmp(msgPacket.data, "Quit")) {
+        if (!stricmp(msgPacket.data, "Quit")) {
             break;
         }
         socklen_t len = sizeof(receiver_address);

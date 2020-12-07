@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 
     if (group_option.is_receiver)
     {
-        set_recv_timeout_ms(gr_socket, group_option.receive_timeout);
+        //set_recv_timeout_ms(gr_socket, group_option.receive_timeout);
 
         while (true) {
             group_receiver(&group_option, gr_socket);

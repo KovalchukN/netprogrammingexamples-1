@@ -1,4 +1,6 @@
 #include "multi_cast.h"
+#include <ctime>
+
 void parse_cmd_line(int argc, char **argv, PMULTICAST_GROUP_OPTION opts) {
 	int i;
     strcpy(opts->ip_interface, "");
@@ -49,7 +51,7 @@ void parse_cmd_line(int argc, char **argv, PMULTICAST_GROUP_OPTION opts) {
 
 int group_sender(PMULTICAST_GROUP_OPTION opts, SOCKET socket, struct sockaddr_in* to) {
     unsigned int i = 0;
-    socklen_t ret;
+    socklen_t ret,ter;
 
     for (i = 0; i < opts->repeat_count; ++i)
     {
@@ -59,18 +61,45 @@ int group_sender(PMULTICAST_GROUP_OPTION opts, SOCKET socket, struct sockaddr_in
         ret = sendto(socket, (char*)sendbuf, strlen(sendbuf), 0, (struct sockaddr*)to, sizeof(sockaddr_in));
         CHECK_IO(ret, -1, "Error send data in group\n");
         current_thread_sleep(500);
+
+		char msg[256] = "";
+		printf("%s", "Enter msg:");
+		scanf("%[^\n]s", msg);
+		ret = sendto(socket, msg, sizeof(msg), 0, (sockaddr*)&to, sizeof(sockaddr_in));
+		CHECK_IO(ret, -1, "Error send data in group\n");
+
+		int leng = sizeof(to);
+		char time_str[256];
+		ter = recvfrom(socket, time_str, sizeof(time_str), 0, (struct sockaddr*)&to, &leng);
+		CHECK_IO(ter, -1, "Error send data in group\n");
+		current_thread_sleep(500);
     }
     return 0;
 }
 
 int group_receiver(PMULTICAST_GROUP_OPTION opts, SOCKET socket) {
-    char recvbuf[BUFSIZE];
-    printf("Try to receive...\n");
-    struct sockaddr_in from;
-    socklen_t len = sizeof(struct sockaddr_in),  ret;
-    ret = recvfrom(socket, recvbuf, BUFSIZE, 0, (struct sockaddr *)&from, &len);
-    CHECK_IO(ret, -1, "Error receive data in group\n");
-    recvbuf[ret] = 0;
-    printf("RECV: '%s' from <%s>\n", recvbuf, inet_ntoa(from.sin_addr));
+	sockaddr_in incom_addr;
+	memset(&incom_addr, 0, sizeof(incom_addr));
+	socklen_t len = sizeof(incom_addr);
+	char buffer[256] = "";
+	int rec_cn = recvfrom(socket, buffer, sizeof(buffer), 0, (sockaddr*)&incom_addr, &len);
+
+	if (rec_cn <= 0) {
+		error_msg("Can't receive data");
+	}
+
+	printf("[From: %s] Received data [%s]\n", inet_ntoa(incom_addr.sin_addr), buffer);
+
+
+	time_t t1;
+	time(&t1);
+	char buff[256];
+	char* time_str = ctime(&t1);
+	strcpy(buff, time_str);
+	int buff_len = sizeof(buff);
+	rec_cn = sendto(socket, buff, buff_len, 0, (sockaddr*)&incom_addr, len);
+	if (rec_cn <= 0) {
+		error_msg("Can't send data");
+	}
     return 0;
 }

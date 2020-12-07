@@ -1,0 +1,2 @@
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe qc ..\..\..\dist\lib\Windows\AMD64\libcommon_net.a CMakeFiles/common_net.dir/src/common_net.cpp.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ranlib.exe ..\..\..\dist\lib\Windows\AMD64\libcommon_net.a
